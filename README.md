@@ -18,24 +18,24 @@ Git clone ansible in standalone dir -- it is required for development.
 
 ```
 $ . ../ansible/hacking/env-setup # preparation step
-.....output skipped
+.....output skipped.....
 $ ../ansible/hacking/test-module -m rest_idem.py -a 'endpoint=www.google.com payload_file=test.json'
 * including generated source, if any, saving to: /Users/timurb/.ansible_module_generated
 * ansiballz module detected; extracted module source to: /Users/timurb/debug_dir
 ***********************************
 RAW OUTPUT
-delete {u'baz': 'qux1'}
-post {u'baz': u'qux'}
-post {u'bah': u'boom'}
+DELETE {"baz": "qux1"}
+POST {"baz": "qux"}
+POST {"bah": "boom"}
 
 {"invocation": {"module_args": {"payload_file": "test.json", "endpoint": "www.google.com"}}, "changed": true, "missing": {"baz": "qux", "bah": "boom"}, "extra": {"baz": "qux1"}}
 
 
 ***********************************
 INVALID OUTPUT FORMAT
-delete {u'baz': 'qux1'}
-post {u'baz': u'qux'}
-post {u'bah': u'boom'}
+DELETE {"baz": "qux1"}
+POST {"baz": "qux"}
+POST {"bah": "boom"}
 
 {"invocation": {"module_args": {"payload_file": "test.json", "endpoint": "www.google.com"}}, "changed": true, "missing": {"baz": "qux", "bah": "boom"}, "extra": {"baz": "qux1"}}
 

@@ -16,10 +16,10 @@ class Endpoint:
                 'hey': 'yo'}
 
     def post(self, payload):
-        print "post", payload
+        print "POST", json.dumps(payload)
 
     def delete(self, payload):
-        print "delete", payload
+        print "DELETE", json.dumps(payload)
 
 
 def diff_state(current, desired):
