@@ -25,6 +25,7 @@ $ ../ansible/hacking/test-module -m rest_idem.py -a 'endpoint=www.google.com pay
 ***********************************
 RAW OUTPUT
 DELETE {"baz": "qux1"}
+DELETE {"hey": "yo"}
 POST {"baz": "qux"}
 POST {"bah": "boom"}
 
@@ -34,6 +35,7 @@ POST {"bah": "boom"}
 ***********************************
 INVALID OUTPUT FORMAT
 DELETE {"baz": "qux1"}
+DELETE {"hey": "yo"}
 POST {"baz": "qux"}
 POST {"bah": "boom"}
 

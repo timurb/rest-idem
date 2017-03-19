@@ -22,19 +22,49 @@ class Endpoint:
         print "DELETE", json.dumps(payload)
 
 
-def diff_state(current, desired):
-    missing = {}
-    extra = {}
+class IdempotentRest:
+    def __init__(self, endpoint):
+        self.endpoint = endpoint
 
-    for key in desired:
-        if key in current:
-            if current[key] != desired[key]:
+    @staticmethod
+    def diff_state(current, desired):
+        missing = {}
+        extra = {}
+
+        for key in desired:
+            if key in current:
+                if current[key] != desired[key]:
+                    missing[key] = desired[key]
+                    extra[key] = current[key]
+            else:
                 missing[key] = desired[key]
-                extra[key] = current[key]
-        else:
-            missing[key] = desired[key]
 
-    return missing, extra
+        for key in current:
+            if key not in desired:
+                extra[key] = current[key]
+
+        return missing, extra
+
+    def match(self, desired_state):
+        current_state = self.endpoint.get()
+
+        return self.diff_state(current=current_state, desired=desired_state)
+
+    def delete(self, values):
+        for key in values:
+            self.endpoint.delete({key: values[key]})
+
+    def post(self, values):
+        for key in values:
+            self.endpoint.post({key: values[key]})
+
+    def update(self, desired_state):
+        missing, extra = self.match(desired_state)
+
+        self.delete(extra)
+        self.post(missing)
+
+        return missing, extra
 
 
 def main():
@@ -48,8 +78,9 @@ def main():
     params = module.params
 
     endpoint_url = params['endpoint']
-    payload_file = params['payload_file']
+    endpoint = Endpoint(url=endpoint_url)
 
+    payload_file = params['payload_file']
     try:
         with open(payload_file) as f:
             desired_state = json.load(f)
@@ -57,24 +88,13 @@ def main():
         e = get_exception()
         module.fail_json(msg="Reading payload from file failed: %s" % str(e))
 
-    endpoint = Endpoint(url=endpoint_url)
-    current_state = endpoint.get()
-
-    missing, extra = diff_state(current=current_state, desired=desired_state)
+    idempotent_endpoint = IdempotentRest(endpoint)
 
     try:
-        for key in extra:
-            endpoint.delete({key: extra[key]})
+        missing, extra = idempotent_endpoint.update(desired_state)
     except Exception:
         e = get_exception()
-        module.fail_json(msg="Error happened while deleting keys: %s" % str(e))
-
-    try:
-        for key in missing:
-            endpoint.post({key: missing[key]})
-    except Exception:
-        e = get_exception()
-        module.fail_json(msg="Error happened while creating keys: %s" % str(e))
+        module.fail_json(msg="Error while processing keys: %s" % str(e))
 
     module.exit_json(changed=True, missing=missing, extra=extra)
 
