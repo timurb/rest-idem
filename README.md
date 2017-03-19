@@ -8,7 +8,6 @@ At the moment testing can be done by doing the following:
 4. Watch the diff in the output.
 
 TODOs:
-* Write unit tests for the module (no idea how to do that)
 * Confirm that the behaviour is desired and add the real REST requests for HTTP endpoint
 
 
